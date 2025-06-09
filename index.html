@@ -5,145 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>صفحة التقديمات</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-      background-color: #f5f6fa;
-      margin: 0;
-      padding: 2rem;
-    }
+  <script type="module">
+    // Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getDatabase, ref, get, set, increment, update, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-    .cards-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 2rem;
-    }
+    const firebaseConfig = {
+      apiKey: "AIzaSyAumOFhHxHUvgR_ERxIUGXch7KPhljZSEs",
+      authDomain: "vamot-cfw.firebaseapp.com",
+      projectId: "vamot-cfw",
+      storageBucket: "vamot-cfw.firebasestorage.app",
+      messagingSenderId: "837905787718",
+      appId: "1:837905787718:web:151456b9ee9cc2e5991347",
+      measurementId: "G-V2SZYV6QZ7",
+      databaseURL: "https://vamot-cfw-default-rtdb.firebaseio.com/"
+    };
 
-    .card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      padding: 1.5rem;
-      transition: transform 0.3s ease;
-      position: relative;
-    }
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card .status {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      background: #192a56;
-      color: white;
-      padding: 0.3rem 0.7rem;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-
-    .card h3 {
-      font-size: 20px;
-      margin-bottom: 1rem;
-      color: #2f3640;
-    }
-
-    .card p {
-      font-size: 15px;
-      color: #57606f;
-      margin-bottom: 1rem;
-      line-height: 1.6;
-    }
-
-    .card .apply-btn {
-      display: inline-block;
-      margin-top: 1rem;
-      background: #192a56;
-      color: white;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: background 0.3s;
-      cursor: pointer;
-    }
-
-    .card .apply-btn:hover {
-      background: #273c75;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background: white;
-      padding: 2rem;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 500px;
-    }
-
-    .modal-content h2 {
-      margin-top: 0;
-      font-size: 20px;
-    }
-
-    .modal-content button {
-      margin-top: 1rem;
-      background: #192a56;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .form-field {
-      margin-top: 1rem;
-    }
-
-    .form-field input,
-    .form-field textarea {
-      width: 100%;
-      padding: 0.6rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-family: 'Cairo', sans-serif;
-    }
-
-    .counter {
-      position: absolute;
-      bottom: 1rem;
-      left: 1rem;
-      font-size: 13px;
-      color: #888;
-    }
-  </style>
-</head>
-<body>
-  <h1 style="text-align: center; margin-bottom: 2rem;">كل التقديمات</h1>
-  <div class="cards-container" id="cards-container">
-    <!-- سيتم إنشاء الكروت تلقائياً من JavaScript -->
-  </div>
-
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <h2 id="modal-title"></h2>
-      <div id="modal-form"></div>
-    </div>
-  </div>
-
-  <script>
     const forms = {
       'إدارة': {
         webhook: 'https://discord.com/api/webhooks/WEBHOOK_ID_ADMIN',
@@ -153,7 +33,6 @@
           'سبب تقديمك على الإدارة؟',
           'هل لديك خبرات إدارية سابقة؟'
         ],
-        applicants: 0,
         description: 'تقديم خاص بالإدارة يتطلب الخبرة والتفاعل العالي.'
       },
       'lspd': {
@@ -164,7 +43,6 @@
           'هل سبق لك الانضمام لوحدة عسكرية؟',
           'ما سبب تقديمك؟'
         ],
-        applicants: 0,
         description: 'شروط صارمة تشمل الالتزام والانضباط والقدرة على القيادة.'
       },
       'برمجة': {
@@ -175,7 +53,6 @@
           'هل لديك مشاريع سابقة؟',
           'رابط GitHub أو معرض أعمال؟'
         ],
-        applicants: 0,
         description: 'للمهتمين بمجال تطوير الأنظمة والبرمجيات.'
       },
       'عصابات': {
@@ -186,7 +63,6 @@
           'ما نوع العصابة التي ترغب بإنشائها؟',
           'عدد الأعضاء المتوقع؟'
         ],
-        applicants: 0,
         description: 'متطلبات خاصة بالتنظيم والتكتيك داخل بيئة اللعب.'
       },
       'ستريمر': {
@@ -197,7 +73,6 @@
           'كم عدد المتابعين؟',
           'ما محتوى البث؟'
         ],
-        applicants: 0,
         description: 'يشترط النشاط الإعلامي وامتلاك قناة نشطة.'
       },
       'وزارة العدل': {
@@ -208,7 +83,6 @@
           'ما المهارات القانونية التي تمتلكها؟',
           'سبب رغبتك بالانضمام؟'
         ],
-        applicants: 0,
         description: 'يشترط الالتزام بالقانون والمعرفة بأنظمة القضاء داخل السيرفر.'
       },
       'الشيرف': {
@@ -220,7 +94,6 @@
           'سبب رغبتك بالانضمام؟',
           'حافظ البروتوكلات والبنود؟'
         ],
-        applicants: 0,
         description: 'شروط صارمة والتزام وعسكرية.'
       }
     };
@@ -235,14 +108,15 @@
         <h3>التقديم على ${title}</h3>
         <p>${forms[title].description}</p>
         <div class="apply-btn" onclick="openForm('${title}')">التقديم الآن</div>
-        <div class="counter" id="counter-${title}">عدد المتقدمين: 0</div>
+        <div class="counter" id="counter-${title}">عدد المتقدمين: جاري التحميل...</div>
       `;
       container.appendChild(card);
+      displayCount(title);
     }
 
     let currentForm = '';
 
-    function openForm(type) {
+    window.openForm = function(type) {
       currentForm = type;
       document.getElementById('modal').style.display = 'flex';
       document.getElementById('modal-title').innerHTML = `شروط التقديم على ${type}`;
@@ -253,7 +127,7 @@
       `;
     }
 
-    function loadQuestions() {
+    window.loadQuestions = function() {
       const questions = forms[currentForm].questions.map((q, i) => {
         return `<div class="form-field"><label>${q}</label><input type="text" id="q${i}"></div>`;
       }).join('');
@@ -261,11 +135,11 @@
       document.getElementById('modal-title').innerText = `الأسئلة - ${currentForm}`;
     }
 
-    function closeModal() {
+    window.closeModal = function() {
       document.getElementById('modal').style.display = 'none';
     }
 
-    function submitForm() {
+    window.submitForm = function() {
       const answers = forms[currentForm].questions.map((q, i) => {
         return `**${q}**\n${document.getElementById('q' + i).value}`;
       }).join('\n\n');
@@ -282,11 +156,140 @@
         })
       });
 
-      forms[currentForm].applicants += 1;
-      document.getElementById(`counter-${currentForm}`).innerText = `عدد المتقدمين: ${forms[currentForm].applicants}`;
+      increaseCount(currentForm);
       closeModal();
       alert('تم إرسال التقديم بنجاح!');
     }
+
+    function increaseCount(type) {
+      const countRef = ref(db, `applicants/${type}`);
+      get(countRef).then(snapshot => {
+        const current = snapshot.val() || 0;
+        set(countRef, current + 1);
+      });
+    }
+
+    function displayCount(type) {
+      const countRef = ref(db, `applicants/${type}`);
+      onValue(countRef, (snapshot) => {
+        const count = snapshot.val() || 0;
+        document.getElementById(`counter-${type}`).innerText = `عدد المتقدمين: ${count}`;
+      });
+    }
   </script>
+  <style>
+    /* نسخ نفس CSS الذي زودتني به بدون تعديل */
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: #f5f6fa;
+      margin: 0;
+      padding: 2rem;
+    }
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+      position: relative;
+    }
+    .card:hover { transform: translateY(-5px); }
+    .card .status {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: #192a56;
+      color: white;
+      padding: 0.3rem 0.7rem;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    .card h3 {
+      font-size: 20px;
+      margin-bottom: 1rem;
+      color: #2f3640;
+    }
+    .card p {
+      font-size: 15px;
+      color: #57606f;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+    .card .apply-btn {
+      display: inline-block;
+      margin-top: 1rem;
+      background: #192a56;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    .card .apply-btn:hover { background: #273c75; }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+    .modal-content button {
+      margin-top: 1rem;
+      background: #192a56;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .form-field {
+      margin-top: 1rem;
+    }
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+    }
+    .counter {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      font-size: 13px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center; margin-bottom: 2rem;">كل التقديمات</h1>
+  <div class="cards-container" id="cards-container"></div>
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2 id="modal-title"></h2>
+      <div id="modal-form"></div>
+    </div>
+  </div>
 </body>
 </html>
